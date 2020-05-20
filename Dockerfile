@@ -28,5 +28,10 @@ RUN echo "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
 # Make sure systemd doesn't start agettys on tty[1-6].
 RUN rm -f /lib/systemd/system/multi-user.target.wants/getty.target
 
+# Remove unnecessary getty and udev targets that result in high CPU usage when using
+# multiple containers with Molecule (https://github.com/ansible/molecule/issues/1104)
+RUN rm -f /lib/systemd/system/systemd*udev* \
+  && rm -f /lib/systemd/system/getty.target
+
 VOLUME ["/sys/fs/cgroup"]
 CMD ["/lib/systemd/systemd"]
